@@ -7,7 +7,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Toast;
 
 import com.example.testshiftcft.databinding.ActivityMainBinding;
 
@@ -24,6 +26,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -52,6 +55,12 @@ public class MainActivity extends AppCompatActivity {
         infoDataList = new ArrayList<String>();
         listAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, infoDataList);
         binding.infoList.setAdapter(listAdapter);
+        binding.infoList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Toast.makeText(MainActivity.this, "Clicked - " + infoDataList.get(i), Toast.LENGTH_SHORT).show();
+            }
+        });
 
     }
 
@@ -91,18 +100,34 @@ public class MainActivity extends AppCompatActivity {
                 if(!data.isEmpty()){
                     Log.d("TAG", data);
                     JSONObject jsonObject  = new JSONObject(data);
-                    JSONArray infoList = jsonObject.getJSONArray("Valute");
-                    String str = "";
+                    JSONObject infoList = jsonObject.getJSONObject("Valute");
 
-                    for (int i = 0; i < infoList.length(); i++) {
-//                        JSONObject info = infoList.getJSONObject(i);
-//                        for (int j = 0; j < info.length(); j++) {
-//                            JSONObject jObj = info.getJSONObject(j);
-//                        }
-                        str = infoList.toString();
+                    infoDataList.clear();
 
+                    for (int i = 0; i < infoList.names().length(); i++) {
+
+                        String str = "";
+                        JSONObject valute = infoList.getJSONObject(infoList.names().getString(i));
+                        str = valute.getString("Name") + " " + valute.getString("Value");
+                        infoDataList.add(str);
+                        
                     }
 
+//                    String keys = infoList.keys().toString();
+//                    ArrayL<String> keys = jsonObject.keys();
+//
+//                    for(String key : keys){
+//
+//                    }
+//
+////                    Iterator<String> keys = jsonObject.keys();
+////
+////                    while(keys.hasNext()) {
+////                        String key = keys.next();
+////                        if (jsonObject.get(key) instanceof JSONObject) {
+////                            // do something with jsonObject here
+////                        }
+////                    }
 
 
 
