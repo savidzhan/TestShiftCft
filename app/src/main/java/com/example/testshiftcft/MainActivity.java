@@ -3,6 +3,7 @@ package com.example.testshiftcft;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -18,6 +19,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -64,7 +68,6 @@ public class MainActivity extends AppCompatActivity {
         binding.infoList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-//                Toast.makeText(MainActivity.this, "Clicked - " + infoDataList.get(i), Toast.LENGTH_SHORT).show();
                 openConvertDialog(valuteNames.get(i), valuteIndex.get(i), values.get(i));
             }
         });
@@ -112,7 +115,25 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 if(!data.isEmpty()){
-                    Log.d("TAG", data);
+
+//                    File file = new File(getCacheDir() + "/info.json");
+//                    FileWriter fileWriter = new FileWriter(file);
+//                    BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+//                    bufferedWriter.write(data);
+//                    bufferedWriter.close();
+
+                    String filename = "config.json";
+                    FileOutputStream outputStream;
+
+                    try {
+                        outputStream = openFileOutput(filename, Context.MODE_PRIVATE);
+                        outputStream.write(data.getBytes());
+                        outputStream.close();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+
                     JSONObject jsonObject  = new JSONObject(data);
                     JSONObject infoList = jsonObject.getJSONObject("Valute");
 
@@ -122,36 +143,18 @@ public class MainActivity extends AppCompatActivity {
 
                         String str = "";
                         JSONObject valute = infoList.getJSONObject(infoList.names().getString(i));
-                        str = valute.getString("Name") + " - " + valute.getString("Value") + "RUB";
+                        Double value;
                         valuteNames.add(valute.getString("Name"));
                         valuteIndex.add(valute.getString("CharCode"));
-                        values.add(Double.parseDouble(valute.getString("Value")));
+                        value = Double.parseDouble(valute.getString("Value")) / Double.parseDouble(valute.getString("Nominal"));
+                        str = valute.getString("Name") + " - " + value + "RUB";
+                        values.add(value);
                         infoDataList.add(str);
                         
                     }
-
-//                    String keys = infoList.keys().toString();
-//                    ArrayL<String> keys = jsonObject.keys();
-//
-//                    for(String key : keys){
-//
-//                    }
-//
-////                    Iterator<String> keys = jsonObject.keys();
-////
-////                    while(keys.hasNext()) {
-////                        String key = keys.next();
-////                        if (jsonObject.get(key) instanceof JSONObject) {
-////                            // do something with jsonObject here
-////                        }
-////                    }
-
-
-
                 } else {
                     Log.d("TAG", "Нихуя нет!!!!");
                 }
-
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             } catch (IOException e) {

@@ -55,14 +55,12 @@ public class ConvertDialog extends AppCompatDialogFragment {
             public void onClick(View view) {
                 if(!TextUtils.isEmpty(etConvertValue.getText().toString())){
                     rubVal = Double.parseDouble(etConvertValue.getText().toString());
-                    resVal = rubVal * othVal;
+                    resVal = rubVal * (1/othVal);
                     result.setText(rubVal + " RUB - " + resVal + " " + index);
 
                 } else {
                     Toast.makeText(getActivity(), "Enter a number", Toast.LENGTH_SHORT).show();
                 }
-
-//                result.setText("WTF?");
             }
         });
 
