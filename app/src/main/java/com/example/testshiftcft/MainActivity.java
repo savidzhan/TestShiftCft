@@ -32,6 +32,9 @@ public class MainActivity extends AppCompatActivity {
 
     ActivityMainBinding binding;
     ArrayList<String> infoDataList;
+    ArrayList<String> valuteNames;
+    ArrayList<String> valuteIndex;
+    ArrayList<Double> values;
     ArrayAdapter<String> listAdapter;
     Handler mainHandler = new Handler();
     ProgressDialog progressDialog;
@@ -53,14 +56,25 @@ public class MainActivity extends AppCompatActivity {
     private void initializeInfoList() {
 
         infoDataList = new ArrayList<String>();
+        valuteNames = new ArrayList<String>();
+        valuteIndex = new ArrayList<String>();
+        values = new ArrayList<Double>();
         listAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, infoDataList);
         binding.infoList.setAdapter(listAdapter);
         binding.infoList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Toast.makeText(MainActivity.this, "Clicked - " + infoDataList.get(i), Toast.LENGTH_SHORT).show();
+//                Toast.makeText(MainActivity.this, "Clicked - " + infoDataList.get(i), Toast.LENGTH_SHORT).show();
+                openConvertDialog(valuteNames.get(i), valuteIndex.get(i), values.get(i));
             }
         });
+
+    }
+
+    private void openConvertDialog(String valName, String valIndex, Double value) {
+
+        ConvertDialog convertDialog = new ConvertDialog(valName, valIndex, value);
+        convertDialog.show(getSupportFragmentManager(), "Converter");
 
     }
 
@@ -108,7 +122,10 @@ public class MainActivity extends AppCompatActivity {
 
                         String str = "";
                         JSONObject valute = infoList.getJSONObject(infoList.names().getString(i));
-                        str = valute.getString("Name") + " " + valute.getString("Value");
+                        str = valute.getString("Name") + " - " + valute.getString("Value") + "RUB";
+                        valuteNames.add(valute.getString("Name"));
+                        valuteIndex.add(valute.getString("CharCode"));
+                        values.add(Double.parseDouble(valute.getString("Value")));
                         infoDataList.add(str);
                         
                     }
