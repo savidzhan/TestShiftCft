@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.testshiftcft.databinding.ActivityMainBinding;
@@ -45,6 +46,8 @@ public class MainActivity extends AppCompatActivity {
     ProgressDialog progressDialog;
     SharedPreferences pos;
     public String fileName = "file";
+    TextView message;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,10 +81,11 @@ public class MainActivity extends AppCompatActivity {
         pos = getSharedPreferences(fileName, 0);
         String saveStr = pos.getString("pwd", "");
         if(!saveStr.isEmpty()){
+            binding.message.setText(" ");
             showData(saveStr);
-
         } else {
-            Toast.makeText(MainActivity.this, "You have naver pressed Update", Toast.LENGTH_LONG).show();
+            binding.message.setText("Press Update!");
+//            Toast.makeText(MainActivity.this, "You have naver pressed Update", Toast.LENGTH_LONG).show();
         }
 
 
