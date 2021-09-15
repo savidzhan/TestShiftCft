@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -42,6 +43,8 @@ public class MainActivity extends AppCompatActivity {
     ArrayAdapter<String> listAdapter;
     Handler mainHandler = new Handler();
     ProgressDialog progressDialog;
+    SharedPreferences pos;
+    public String fileName = "file";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +75,16 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        pos = getSharedPreferences(fileName, 0);
+        String saveStr = pos.getString("pwd", "");
+        if(!saveStr.isEmpty()){
+            showData(saveStr);
+
+        } else {
+            Toast.makeText(MainActivity.this, "You have naver pressed Update", Toast.LENGTH_LONG).show();
+        }
+
+
     }
 
     private void openConvertDialog(String valName, String valIndex, Double value) {
@@ -79,6 +92,33 @@ public class MainActivity extends AppCompatActivity {
         ConvertDialog convertDialog = new ConvertDialog(valName, valIndex, value);
         convertDialog.show(getSupportFragmentManager(), "Converter");
 
+    }
+
+    public void showData(String jsonString){
+        try {
+            JSONObject jsonObject  = new JSONObject(jsonString);
+            JSONObject infoList = jsonObject.getJSONObject("Valute");
+
+            infoDataList.clear();
+            valuteIndex.clear();
+            values.clear();
+
+            for (int i = 0; i < infoList.names().length(); i++) {
+
+                String str = "";
+                JSONObject valute = infoList.getJSONObject(infoList.names().getString(i));
+                Double value;
+                valuteNames.add(valute.getString("Name"));
+                valuteIndex.add(valute.getString("CharCode"));
+                value = Double.parseDouble(valute.getString("Value")) / Double.parseDouble(valute.getString("Nominal"));
+                str = valute.getString("Name") + " - " + value + "RUB";
+                values.add(value);
+                infoDataList.add(str);
+
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     class fetchData extends Thread{
@@ -116,50 +156,19 @@ public class MainActivity extends AppCompatActivity {
 
                 if(!data.isEmpty()){
 
-//                    File file = new File(getCacheDir() + "/info.json");
-//                    FileWriter fileWriter = new FileWriter(file);
-//                    BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-//                    bufferedWriter.write(data);
-//                    bufferedWriter.close();
+                    pos = getSharedPreferences(fileName, 0);
+                    SharedPreferences.Editor editor = pos.edit();
+                    editor.putString("pwd",data);
+                    editor.commit();
 
-                    String filename = "config.json";
-                    FileOutputStream outputStream;
+                    showData(data);
 
-                    try {
-                        outputStream = openFileOutput(filename, Context.MODE_PRIVATE);
-                        outputStream.write(data.getBytes());
-                        outputStream.close();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-
-
-                    JSONObject jsonObject  = new JSONObject(data);
-                    JSONObject infoList = jsonObject.getJSONObject("Valute");
-
-                    infoDataList.clear();
-
-                    for (int i = 0; i < infoList.names().length(); i++) {
-
-                        String str = "";
-                        JSONObject valute = infoList.getJSONObject(infoList.names().getString(i));
-                        Double value;
-                        valuteNames.add(valute.getString("Name"));
-                        valuteIndex.add(valute.getString("CharCode"));
-                        value = Double.parseDouble(valute.getString("Value")) / Double.parseDouble(valute.getString("Nominal"));
-                        str = valute.getString("Name") + " - " + value + "RUB";
-                        values.add(value);
-                        infoDataList.add(str);
-                        
-                    }
                 } else {
-                    Log.d("TAG", "Нихуя нет!!!!");
+                    Log.d("TAG", "Информация отсутствует");
                 }
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             } catch (IOException e) {
-                e.printStackTrace();
-            } catch (JSONException e) {
                 e.printStackTrace();
             }
 
